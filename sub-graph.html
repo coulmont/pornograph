@@ -1,0 +1,62 @@
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF8">
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <script src="js/libs/jquery.js"></script>
+    <script src="js/libs/underscore.js"></script>
+    <script src="js/libs/backbone.js"></script>
+
+    <script src="js/libs/d3.v3.js"></script>
+    <script src="js/libs/d3.tip.js"></script>
+    <script src="js/model.js"></script>
+    <script src="js/view.js"></script>
+    <script src="js/src.js"></script>
+
+
+</head>
+<body>
+<h2>Porn-o-Graph</h2>
+
+
+<script type="text/template" id="info_template">
+    <table>
+        <tr>
+            <td width="300">
+                Current center node: <%= center_node_name %>
+            </td>
+            <td>
+                Hover node: <%= hover_node_name %>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Number of edges: <%= center_node_number_edges %>
+            </td>
+            <td>
+                Number of displayed and hidden edges: <%= hover_node_number_edges %>
+            </td>
+        </tr>
+    </table>
+
+
+
+</script>
+
+<div id="info_container"></div>
+<hr>
+Maximal Distance:
+<select id="max-distance" onchange="distanceChange()">
+    <option>0</option>
+    <option>1</option>
+    <option selected>2</option>
+    <option>3</option>
+    <option>4</option>
+</select>
+<br>
+<br>
+
+<div id="graph">
+</div>
+</body>
+</html>
