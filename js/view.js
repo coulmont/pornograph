@@ -7,6 +7,9 @@ var firstRound = true;
 
 var transition = false;
 
+var bbxwidth = 80, bbxheight =20, rc = 10;
+var bgcol="#ffa";
+var bgcolcenter="#af1";
 
 var GraphView = Backbone.View.extend({
 
@@ -154,11 +157,18 @@ var GraphView = Backbone.View.extend({
         tick: function () {
             //    console.log("tick");
 
-            this.node
-                .attr("cx", function (d) {
+            this.node.selectAll("rect")
+                .attr("x", function (d) {
+                    return d.x-bbxwidth/2;
+                })
+                .attr("y", function (d) {
+                    return d.y-bbxheight/2;
+                });
+        this.node.selectAll("text")
+                .attr("x", function (d) {
                     return d.x;
                 })
-                .attr("cy", function (d) {
+                .attr("y", function (d) {
                     return d.y;
                 });
 
@@ -210,15 +220,18 @@ var GraphView = Backbone.View.extend({
             }
 
  
-            this.node.enter()
-                .append("circle")
-                .style("opacity", 1)
+            cg=this.node.enter()
+                .append("g")
                	.attr("class", "node")
-                .style("fill", function (d) {
-                    return d.color;
-                })
-                .attr("r", 18)
-                /*.on('mouseover', this.mouseOver)*/
+
+                
+            cg.append("rect")
+                .style("opacity", 1)
+                .style("fill",bgcol)
+                .attr("width",bbxwidth)
+                .attr("height",bbxheight)
+                .attr("rx",rc)
+                .attr("ry",rc)                 
                 .on('mousedown', this.mouseDown)
                 .on('mouseout', this.mouseOut)
                 .on("dragstart", this.dragStart)
@@ -228,12 +241,26 @@ var GraphView = Backbone.View.extend({
                 .style("opacity", 1)
                 .each("end",function(){transition=false;});
             
+            cg.append("text")
+                .style("opacity", 1)
+                .style("fill","#000")
+                .text(function(d){return d.name})
+                .style("text-anchor","middle")
+                .style("dominant-baseline","middle")
+                     .on('mousedown', this.mouseDown)
+                .on('mouseout', this.mouseOut)
+                .on("dragstart", this.dragStart)
+                .on("click", this.click)
+                .call(this.nodeDrag)
+                .transition().duration(1000)
+                .style("opacity", 1)
+                .each("end",function(){transition=false;});
     
             this.node.each(function(d) {
                 if (d.centerNode==false) {
-                  this.setAttribute('r',12);
+                  d3.select(this).selectAll("rect").style("fill",bgcol)
                 } else if (firstRound) {
-                    this.setAttribute('r',30);
+                  d3.select(this).selectAll("rect").style("fill",bgcolcenter)
                     firstRound  =false;
                 }
             });
@@ -251,29 +278,19 @@ var GraphView = Backbone.View.extend({
 
         dragStart: function () {
             if(transition) return;
-
             drag = true;
-            d3.select(this)
-                .style("fill", "orange");
         },
 
         dragEnd: function (d) {
-            console.log("dragEnd");
             drag = false;
-            d3.select(this)
-                .style("fill", d.color);
         },
 
         mouseOver: function (d) {
 
-           //console.log("mouseOver",d);
+           console.log("mouseOver",d);
 
             if(transition) return;
             if (drag == false) {
-                d3.select(d3.event.toElement)
-                    .transition()
-                    .duration(250)
-                    .style("fill", "red");
                 this.tip.show(d);
                 d.fixed = true;
                 this.setInfo(d.name, d.numberOfEdges);
@@ -283,7 +300,6 @@ var GraphView = Backbone.View.extend({
 
         mouseDown: function(d) {
 
-            this.tip.hide();
         },
 
         mouseOut: function (d) {
@@ -291,10 +307,6 @@ var GraphView = Backbone.View.extend({
             if(transition) return;
             if(drag == false) {
 
-            d3.select(d3.event.fromElement)
-                .transition()
-                .duration(250)
-                .style("fill", d.color);
             this.tip.hide();
              d.fixed = false;
             this.setInfo();
@@ -308,12 +320,8 @@ var GraphView = Backbone.View.extend({
 
             if (d3.event.defaultPrevented) return;
 
-
-            d3.select(this)
-                .transition().duration(250)
-                .style("fill", d.color)
-                .attr("r",30);
-
+            d3.select(this.parentNode).selectAll("rect").style("fill",bgcolcenter)
+            console.log(d.id)
             theModel.fetch(d.id, $('#max-distance option:selected').text());
         },
 
